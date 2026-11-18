@@ -78,7 +78,7 @@ def heart_icon() -> Gtk.Widget:
 def status_icon(status: str | None, tip_inferred: str = "") -> Gtk.Widget:
     icon_name, cls, tip = {
         "yes": ("object-select-symbolic", "got", "Done"),
-        "inferred": ("dialog-question-symbolic", "maybe", tip_inferred),
+        "inferred": ("object-select-symbolic", "maybe", tip_inferred),
         None: ("radio-symbolic", "missing", "Not done yet"),
     }[status]
     img = Gtk.Image(icon_name=icon_name, valign=Gtk.Align.CENTER, tooltip_text=tip)
@@ -131,8 +131,16 @@ def item_picture(path: Path, owned: bool, size: int) -> Gtk.Widget:
         pic.add_css_class("not-owned")
     return pic
 
+# Only item-like checks get pictures; heart pieces, skulltulas and counted rows never do (their
+# ids can collide with item names, e.g. MM3D's "Keaton Quiz" heart piece and keaton.png).
+ICON_PREFIXES = ("m_", "i_", "s_", "e_", "u_", "q_", "r_", "it_", "el_", "sc_", "bf_",
+                 "pe_", "cr_", "es_", "se_", "tu_", "rv_", "ni_", "in_", "so_", "up_", "bg_")
+
+
 def find_game_icon(game_id: str, row_id: str) -> Path | None:
     """icons/<game>/<id without prefix>.png, e.g. icons/oot3d/hookshot.png for i_hookshot."""
+    if not row_id.startswith(ICON_PREFIXES):
+        return None
     key = f"{game_id}/{row_id}"
     if key not in _icon_cache:
         stem = row_id.split("_", 1)[-1]
@@ -142,7 +150,8 @@ def find_game_icon(game_id: str, row_id: str) -> Path | None:
     return _icon_cache[key]
 
 
-INFERRED_TIP = "Probably done: worked out from your heart total, since the save has no flag for it."
+INFERRED_TIP = ("Probably done: worked out from other progress in your save (heart total or dungeon "
+                "rewards), because the save has no flag for this exact item.")
 
 
 class TrackerWindow(Adw.ApplicationWindow):
@@ -608,8 +617,11 @@ class TrackerWindow(Adw.ApplicationWindow):
             return clamp
         if sec.banner:
             page.append(self._banner("dialog-question-symbolic", sec.banner))
-        if sec.intro:
-            info = Gtk.Label(label=sec.intro, xalign=0, wrap=True)
+        intro = sec.intro
+        if sec.counted is not None:
+            intro += " Tap a marker to tick off the ones you've found; the app remembers them for this save."
+        if intro:
+            info = Gtk.Label(label=intro.strip(), xalign=0, wrap=True)
             info.add_css_class("dim-label")
             page.append(info)
         if sec.guide:
@@ -624,13 +636,17 @@ class TrackerWindow(Adw.ApplicationWindow):
         counted = sec.counted is not None
         for title, members in groups.items():
             got = sum(1 for m in members if m.ok)
-            shown = [m for m in members if counted or self.filter_mode == "all" or not m.ok]
+            ticks = self._ticks() if counted else set()
+            shown = [m for m in members if self.filter_mode == "all"
+                     or (counted and m.id not in ticks) or (not counted and not m.ok)]
             if not shown:
                 continue
             shown_total += len(shown)
             group = Adw.PreferencesGroup(title=GLib.markup_escape_text(title or sec.title))
             if counted:
-                group.set_header_suffix(chip(f"{len(members)}", False))
+                mine = sum(1 for m in members if m.id in self._ticks())
+                group.set_header_suffix(chip(f"{mine} / {len(members)} ticked" if mine else f"{len(members)}",
+                                             mine == len(members)))
             else:
                 group.set_header_suffix(chip(f"{got} / {len(members)}", got == len(members)))
             for m in shown:
@@ -664,8 +680,48 @@ class TrackerWindow(Adw.ApplicationWindow):
         group.add(row)
         return group
 
-    @staticmethod
-    def _row_widget(game_id: str, m: Row, guide_only: bool = False) -> Gtk.Widget:
+    # ---- your own ticks for guide lists (the save can't tell which piece you found) ----------
+    def _tick_key(self) -> str:
+        return f"{self.game.id}|{self.current.key}" if self.game and self.current else ""
+
+    def _ticks(self) -> set[str]:
+        return set(self.state.get("ticks", {}).get(self._tick_key(), []))
+
+    def _set_tick(self, rid: str, on: bool) -> None:
+        all_ticks = self.state.setdefault("ticks", {})
+        cur = set(all_ticks.get(self._tick_key(), []))
+        (cur.add if on else cur.discard)(rid)
+        all_ticks[self._tick_key()] = sorted(cur)
+        save_state(self.state)
+
+    def _tick_button(self, row: Gtk.Widget, m: Row) -> Gtk.Widget:
+        img = Gtk.Image(valign=Gtk.Align.CENTER)
+        img.add_css_class("piece-icon")
+        btn = Gtk.Button(child=img, valign=Gtk.Align.CENTER)
+        btn.add_css_class("flat")
+        btn.add_css_class("z-tick")
+
+        def paint(on: bool):
+            img.set_from_icon_name("object-select-symbolic" if on else "find-location-symbolic")
+            for cls in ("got", "guide"):
+                img.remove_css_class(cls)
+            img.add_css_class("got" if on else "guide")
+            btn.set_tooltip_text("Found (your tick). Tap to untick." if on else
+                                 "Tap to tick this off once you've found it. Your save can't tell which ones you have.")
+            (row.add_css_class if on else row.remove_css_class)("got-row")
+
+        def toggle(_b):
+            on = m.id not in self._ticks()
+            self._set_tick(m.id, on)
+            paint(on)
+            if self.detail_sec and self.detail_scroller:  # refresh counters and the Missing filter
+                GLib.idle_add(lambda: (self._set_scrolled(self.detail_scroller,
+                                                          self._build_detail(self.detail_sec), keep=True), False)[1])
+        btn.connect("clicked", toggle)
+        paint(m.id in self._ticks())
+        return btn
+
+    def _row_widget(self, game_id: str, m: Row, guide_only: bool = False) -> Gtk.Widget:
         sub = m.hint + (f"\n{m.detail}" if m.detail and not m.ok else "")
         if m.steps:
             row = Adw.ExpanderRow(title=GLib.markup_escape_text(m.name),
@@ -677,11 +733,7 @@ class TrackerWindow(Adw.ApplicationWindow):
                                 subtitle=GLib.markup_escape_text(sub.strip()))
             row.set_subtitle_lines(3)
         if guide_only:
-            img = Gtk.Image(icon_name="find-location-symbolic", valign=Gtk.Align.CENTER,
-                            tooltip_text="Your save only stores the total, so this can't be ticked off")
-            img.add_css_class("piece-icon")
-            img.add_css_class("guide")
-            row.add_prefix(img)
+            row.add_prefix(self._tick_button(row, m))
         else:
             row.add_prefix(status_icon(m.status, INFERRED_TIP))
         icon = find_game_icon(game_id, m.id)
@@ -699,7 +751,7 @@ class TrackerWindow(Adw.ApplicationWindow):
     @staticmethod
     def _icon_grid(game_id: str, rows: list[Row]) -> Gtk.Widget | None:
         with_icons = [(m, find_game_icon(game_id, m.id)) for m in rows]
-        if not any(p for _m, p in with_icons):
+        if not with_icons or not all(p for _m, p in with_icons):
             return None
         grid = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, homogeneous=True,
                            min_children_per_line=4, max_children_per_line=8,

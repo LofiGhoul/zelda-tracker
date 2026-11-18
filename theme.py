@@ -51,7 +51,7 @@ window.zelda headerbar {{
   box-shadow: 0 1px 0 alpha(black, .5);
 }}
 window.zelda headerbar .title {{
-  font-family: {SERIF}; font-weight: 700; letter-spacing: 1px; color: {GOLD_LIGHT};
+  font-family: {SERIF}; font-weight: 700; color: {GOLD_LIGHT};
 }}
 window.zelda headerbar .subtitle {{ color: {PARCHMENT_DIM}; }}
 window.zelda scrolledwindow, window.zelda viewport, window.zelda stack {{ background: transparent; }}
@@ -99,9 +99,11 @@ window.zelda .z-display {{ font-family: {SERIF}; }}
 .piece-icon {{ border-radius: 999px; min-width: 30px; min-height: 30px; }}
 .piece-icon.got {{ background: radial-gradient(circle, {GOLD_LIGHT}, {GOLD}); color: #2a1e08;
                    box-shadow: 0 0 6px alpha({GOLD}, .5); }}
-.piece-icon.maybe {{ background: alpha(#e0a040, .25); color: #f0c060; border: 1px dashed alpha(#f0c060, .7); }}
+.piece-icon.maybe {{ background: alpha(#e0a040, .28); color: #f6cf6a; border: 1px dashed alpha(#f6cf6a, .8); }}
 .piece-icon.missing {{ background: alpha(black, .35); color: alpha({GOLD}, .45); border: 1px solid alpha({GOLD}, .35); }}
 .piece-icon.guide {{ background: alpha(var(--z-accent), .15); color: var(--z-accent); border: 1px solid alpha(var(--z-accent), .45); }}
+button.z-tick {{ padding: 0; min-width: 0; min-height: 0; border-radius: 999px; }}
+button.z-tick:hover .piece-icon {{ box-shadow: 0 0 0 2px alpha({GOLD}, .5); }}
 image.not-owned {{ opacity: .25; filter: grayscale(1); }}
 
 .region-chip {{ border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700;
