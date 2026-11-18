@@ -62,10 +62,10 @@ def _find_slots(d: bytes) -> list[tuple[int, int]]:
 
 ITEMS = [  # (item id, name, hint)
     (0x01, "Smith's Sword", "From the Smith at the start."),
-    (0x07, "Bombs", ""),
-    (0x09, "Bow", ""),
-    (0x0B, "Boomerang", ""),
-    (0x0D, "Shield", "Stockwell's shop in Hyrule Town."),
+    (0x07, "Bombs", "A bomb bag from the Minish in the Minish Woods (Belari's area)."),
+    (0x09, "Bow", "Big chest of the Minish Mulldozers in Castor Wilds."),
+    (0x0B, "Boomerang", "Stockwell's shop in Hyrule Town (300 Rupees)."),
+    (0x0D, "Shield", "On the floor of the Smith's house at the start."),
     (0x0F, "Lamp", "Temple of Droplets."),
     (0x11, "Gust Jar", "Deepwood Shrine."),
     (0x12, "Cane of Pacci", "Cave of Flames."),
@@ -79,13 +79,13 @@ ITEMS = [  # (item id, name, hint)
     (0x67, "Kinstone Bag", ""),
 ]
 UPGRADED = [
-    (0x02, "White Sword", "Infuse the Earth Element at the Elemental Sanctuary."),
-    (0x03, "White Sword (two elements)", "Infuse the Fire Element."),
-    (0x04, "White Sword (three elements)", "Infuse the Water Element."),
-    (0x06, "Four Sword", "Infuse the Wind Element."),
+    (0x02, "White Sword", "Melari forges it on Mt. Crenel after the Cave of Flames."),
+    (0x03, "White Sword (two elements)", "Infuse Elements at the Elemental Sanctuary."),
+    (0x04, "White Sword (three elements)", "Infuse Elements at the Elemental Sanctuary."),
+    (0x06, "Four Sword", "Infuse all four Elements at the Elemental Sanctuary."),
     (0x08, "Remote Bombs", ""),
-    (0x0A, "Light Arrows", ""),
-    (0x0C, "Magical Boomerang", ""),
+    (0x0A, "Light Arrows", "From Gregal in the Wind Tribe tower."),
+    (0x0C, "Magical Boomerang", "Big chest in North Hyrule Field, opened by a Kinstone fusion."),
     (0x0E, "Mirror Shield", "From Biggoron."),
 ]
 ELEMENTS = [
@@ -130,11 +130,22 @@ class MinishCap(Game):
         hearts, pieces = max_hp // 8, s[STATS + 1] & 3
         res = Result(self, slot, name, hearts, pieces)
 
-        extra = hearts - 3
-        heart_sec = Section("hearts", "Hearts", None, [
-            Row(f"ht_{k + 4}", f"Heart {k + 4}", "", y(k < extra)) for k in range(17)
-        ], intro=(f"{hearts} of 20 hearts, plus {pieces}/4 toward the next. 6 come from bosses and "
-                  "11 from the 44 Pieces of Heart; the save doesn't record which pieces you found."))
+        from .guides import tmc_data
+        boss_done = [inv(0x40), inv(0x41), inv(0x17), inv(0x42), inv(0x43)]  # elements / ocarina after the boss
+        hc_rows = []
+        for i, (area, _name, _st) in enumerate(tmc_data.HEART_CONTAINERS):
+            done = boss_done[i - 1] if 0 < i <= len(boss_done) else False
+            label = "Librari's Heart Container" if i == 0 else f"{area} Heart Container"
+            hc_rows.append(Row(f"hc_{i + 1}", label, f"{area}.", "inferred" if done else None))
+        containers = sum(1 for r in hc_rows if r.ok)
+        found = max(0, min(44, (hearts - 3 - containers) * 4 + pieces))
+        heart_sec = Section("hearts", "Pieces of Heart", None,
+                            [Row(rid, desc, "", None, group=area) for rid, desc, area in tmc_data.HEART_PIECES],
+                            counted=found,
+                            intro=(f"Your hearts show about {found} of 44 pieces. The save only keeps your heart "
+                                   "total, so every piece is listed as a guide; tap one for the steps."))
+        hc_sec = Section("bosses", "Heart Containers", "emblem-favorite-symbolic", hc_rows,
+                         intro="Boss containers are marked from the Elements (and Ocarina) you have.")
 
         figs = [(n, bool(s[FIGURINES + (n >> 3)] >> (n & 7) & 1)) for n in range(1, 137)]
         fig_count = sum(ok for _n, ok in figs)
@@ -158,6 +169,7 @@ class MinishCap(Game):
 
         res.sections = [
             heart_sec,
+            hc_sec,
             Section("elements", "Elements", "starred-symbolic",
                     [Row(f"el_{i:02x}", n, h, y(inv(i))) for i, n, h in ELEMENTS]),
             Section("items", "Items", "view-grid-symbolic",

@@ -621,16 +621,20 @@ class TrackerWindow(Adw.ApplicationWindow):
         for row in sec.rows:
             groups.setdefault(row.group, []).append(row)
         shown_total = 0
+        counted = sec.counted is not None
         for title, members in groups.items():
             got = sum(1 for m in members if m.ok)
-            shown = [m for m in members if self.filter_mode == "all" or not m.ok]
+            shown = [m for m in members if counted or self.filter_mode == "all" or not m.ok]
             if not shown:
                 continue
             shown_total += len(shown)
             group = Adw.PreferencesGroup(title=GLib.markup_escape_text(title or sec.title))
-            group.set_header_suffix(chip(f"{got} / {len(members)}", got == len(members)))
+            if counted:
+                group.set_header_suffix(chip(f"{len(members)}", False))
+            else:
+                group.set_header_suffix(chip(f"{got} / {len(members)}", got == len(members)))
             for m in shown:
-                group.add(self._row_widget(r.game.id, m))
+                group.add(self._row_widget(r.game.id, m, guide_only=counted))
             page.append(group)
         if not shown_total:
             page.append(Adw.StatusPage(icon_name="starred-symbolic", title="All done here!",
@@ -661,7 +665,7 @@ class TrackerWindow(Adw.ApplicationWindow):
         return group
 
     @staticmethod
-    def _row_widget(game_id: str, m: Row) -> Gtk.Widget:
+    def _row_widget(game_id: str, m: Row, guide_only: bool = False) -> Gtk.Widget:
         sub = m.hint + (f"\n{m.detail}" if m.detail and not m.ok else "")
         if m.steps:
             row = Adw.ExpanderRow(title=GLib.markup_escape_text(m.name),
@@ -672,7 +676,14 @@ class TrackerWindow(Adw.ApplicationWindow):
             row = Adw.ActionRow(title=GLib.markup_escape_text(m.name),
                                 subtitle=GLib.markup_escape_text(sub.strip()))
             row.set_subtitle_lines(3)
-        row.add_prefix(status_icon(m.status, INFERRED_TIP))
+        if guide_only:
+            img = Gtk.Image(icon_name="find-location-symbolic", valign=Gtk.Align.CENTER,
+                            tooltip_text="Your save only stores the total, so this can't be ticked off")
+            img.add_css_class("piece-icon")
+            img.add_css_class("guide")
+            row.add_prefix(img)
+        else:
+            row.add_prefix(status_icon(m.status, INFERRED_TIP))
         icon = find_game_icon(game_id, m.id)
         if icon:
             row.add_prefix(item_picture(icon, m.ok, 36))

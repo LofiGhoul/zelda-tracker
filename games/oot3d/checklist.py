@@ -214,7 +214,7 @@ UPGRADES = (
     _up("u_bombbag40", "Biggest Bomb Bag (40)", f"Bombchu Bowling or the rolling Goron: {EITHER}", 3, 3),
     _up("u_bracelet", "Goron's Bracelet", "From Darunia after playing Saria's Song.", 6, 1),
     _up("u_silver_gauntlets", "Silver Gauntlets", "Child: in the Spirit Temple.", 6, 2),
-    _up("u_golden_gauntlets", "Golden Gauntlets", "In Ganon's Castle, at the end of the Light Trial.", 6, 3),
+    _up("u_golden_gauntlets", "Golden Gauntlets", "In Ganon's Castle, in the Shadow Trial.", 6, 3),
     _up("u_silver_scale", "Silver Scale", "Child: win the diving game in Zora's Domain.", 9, 1),
     _up("u_gold_scale", "Golden Scale", "Adult: catch a big enough fish at the Fishing Pond.", 9, 2),
     _up("u_wallet200", "Adult's Wallet", "10 Gold Skulltula tokens.", 12, 1, 2),

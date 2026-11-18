@@ -1,45 +1,67 @@
-"""Step-by-step guide for The Minish Cap."""
+"""Step-by-step guide for The Minish Cap. Locations come from the Minish Cap Randomizer's logic
+(games/guides/tmc_data.py, generated)."""
 
-BLADE = ("Find the Blade Brothers' dojos around Hyrule (Swiftblade's is in Hyrule Town).",
-         "Each brother teaches a technique; talk to him and pass his test. Some only teach you once "
-         "you have enough hearts.")
+from .tmc_data import HEART_CONTAINERS, HEART_PIECE_STEPS, ITEM_LOCATIONS
+
+
+def _loc(key: str, n: int = 0) -> tuple[str, ...]:
+    spots = ITEM_LOCATIONS.get(key, [])
+    return tuple(spots[n][2]) if len(spots) > n else ()
+
+
+ITEM_KEYS = {
+    "it_01": "@SMITHSWORD", "it_09": "@BOW", "it_0b": "@BOOMERANG", "it_0d": "@SHIELD",
+    "it_0f": "Lantern", "it_11": "GustJar", "it_12": "PacciCane", "it_13": "MoleMitts", "it_14": "RocsCape",
+    "it_15": "PegasusBoots", "it_17": "Ocarina", "it_44": "GripRing", "it_45": "PowerBracelets", "it_46": "Flippers",
+    "it_02": "@GREENSWORD", "it_03": "@REDSWORD", "it_04": "@BLUESWORD", "it_06": "@FOURSWORD",
+    "it_08": "RemoteBombs", "it_0a": "@LIGHTARROW", "it_0c": "@MAGICBOOMERANG", "it_0e": "@MIRROR",
+    "el_40": "EarthElement", "el_41": "FireElement", "el_42": "WaterElement", "el_43": "WindElement",
+    "sc_48": "@SPINATTACK", "sc_49": "RollAttack", "sc_4a": "DashAttack", "sc_4b": "RockBreaker",
+    "sc_4c": "SwordBeam", "sc_4d": "@GREATSPIN", "sc_4e": "DownThrust", "sc_4f": "PerilBeam",
+    "sc_73": "@FASTSPIN", "sc_74": "@FASTSPLIT", "sc_75": "@LONGSPIN",
+    "bf_70": "ArrowButterfly", "bf_71": "DigButterfly", "bf_72": "SwimButterfly",
+}
+GENERATED = {
+    **HEART_PIECE_STEPS,
+    **{rid: _loc(key) for rid, key in ITEM_KEYS.items() if _loc(key)},
+    **{f"up_wallet{n + 1}": _loc("Wallet", n) for n in range(3)},
+    **{f"up_bombs{i + 1}": st for i, st in enumerate(
+        [tuple(sp[2]) for sp in ITEM_LOCATIONS.get("BombBag", []) if "bomb-making" not in sp[1]][:3])},
+    "it_07": next((tuple(sp[2]) for sp in ITEM_LOCATIONS.get("BombBag", []) if "bomb-making" in sp[1]), ()),
+    **{f"up_quiver{n + 1}": _loc("LargeQuiver", n) for n in range(2)},
+    **{f"bt_{n + 1}": _loc("Bottle", n) for n in range(4)},
+    **{f"hc_{i + 1}": tuple(st) for i, (_a, _n, st) in enumerate(HEART_CONTAINERS)},
+}
+
 
 STEPS = {
+    **{k: v for k, v in GENERATED.items() if v},
     "el_40": ("Go into Deepwood Shrine in the Minish Woods.", "Beat Big Green ChuChu; the Earth Element is behind it."),
     "el_41": ("Go into the Cave of Flames on Mt. Crenel.", "Beat Gleerok; the Fire Element is behind it."),
     "el_42": ("Go into the Temple of Droplets in Lake Hylia.", "Beat Big Octorok; the Water Element is behind it."),
     "el_43": ("Go up to the Palace of Winds in the Cloud Tops.", "Beat Gyorg Pair; the Wind Element is behind it."),
     "it_01": ("Watch the opening at the Smith's house in Hyrule Town.", "The Smith gives you his sword after the festival."),
-    "it_0d": ("Buy the shield at Stockwell's shop in Hyrule Town.",),
+
     "it_0f": ("It's in the Temple of Droplets, partway through.",),
     "it_11": ("It's the main item of Deepwood Shrine.",),
     "it_12": ("It's the main item of the Cave of Flames.",),
     "it_13": ("It's the main item of the Fortress of Winds.",),
     "it_14": ("It's the main item of the Palace of Winds.",),
     "it_17": ("Finish the Fortress of Winds.", "Ezlo's story leads you to the Ocarina of Wind afterwards."),
-    "it_02": ("Take the Earth Element to the Elemental Sanctuary in Hyrule Castle's garden.",
-              "Infuse it into your sword to make the White Sword."),
+    "it_02": ("Finish the Cave of Flames on Mt. Crenel.", "Melari the Minish blacksmith re-forges the Picori Blade into the White Sword."),
     "it_03": ("Infuse the Fire Element at the Elemental Sanctuary.",),
     "it_04": ("Infuse the Water Element at the Elemental Sanctuary.",),
     "it_06": ("Infuse the Wind Element at the Elemental Sanctuary.", "The sword becomes the Four Sword."),
     "it_0e": ("Climb to Biggoron on Veil Falls.", "Let him eat your shield, then come back later.",
               "He gives you the Mirror Shield in return."),
-    **{f"sc_{i:02x}": BLADE for i in (0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F)},
-    **{f"sc_{i:02x}": ("This scroll is hidden in the world, not taught at a dojo.",
-                       "Look for it after you've learned the basic techniques.") for i in (0x73, 0x74, 0x75)},
-    **{f"bf_{i:02x}": ("A butterfly appears after certain Kinstone fusions.", "Catch it to gain its ability.")
-       for i in (0x70, 0x71, 0x72)},
-    **{f"up_wallet{n}": ("Wallet upgrades come from side quests and Kinstone fusions.",) for n in (1, 2, 3)},
-    **{f"up_bombs{n}": ("Bomb Bag upgrades come from Business Scrubs and side quests.",) for n in (1, 2, 3)},
-    **{f"up_quiver{n}": ("Quiver upgrades come from side quests and Kinstone fusions.",) for n in (1, 2)},
 }
 
 SECTIONS = {
     "hearts": (
-        "6 hearts come from beating the bosses of the first six dungeons.",
-        "The other 11 come from 44 Pieces of Heart (4 per heart). Many are behind Kinstone fusions, "
-        "in caves, minigames and dojos.",
-        "The save only stores your total, so this list fills in as your hearts go up.",
+        "There are 44 Pieces of Heart (4 per heart); 6 more hearts are Heart Containers (5 bosses and Librari).",
+        "Each piece below has its own steps. Many are behind Kinstone fusions, in caves, minigames and dojos.",
+        "Your save only keeps the heart total, so the tracker can't tick off individual pieces; "
+        "use the count at the top to see how many you still need.",
     ),
     "figurines": (
         "Go to Carlov's figurine gallery in Hyrule Town.",

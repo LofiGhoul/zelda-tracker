@@ -35,9 +35,13 @@ class Section:
     intro: str = ""               # line shown above the rows
     banner: str = ""              # highlighted notice (e.g. inferred pieces)
     guide: tuple[str, ...] = ()   # how-to steps for the whole section (counted items)
+    counted: int | None = None    # set when the save only stores a total: rows are a guide list
+                                  # and this many of them are done (which ones is unknown)
 
     @property
     def done(self) -> int:
+        if self.counted is not None:
+            return min(self.counted, len(self.rows))
         return sum(1 for r in self.rows if r.ok)
 
 
@@ -57,12 +61,17 @@ class Result:
     @property
     def overall(self) -> tuple[int, int]:
         done, total = set(), set()
+        extra_done = extra_total = 0
         for s in self.sections:
+            if s.counted is not None:
+                extra_done += s.done
+                extra_total += len(s.rows)
+                continue
             for r in s.rows:
                 total.add(r.id)
                 if r.ok:
                     done.add(r.id)
-        return len(done), len(total)
+        return len(done) + extra_done, len(total) + extra_total
 
 
 @dataclass(frozen=True)

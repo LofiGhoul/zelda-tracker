@@ -101,6 +101,7 @@ window.zelda .z-display {{ font-family: {SERIF}; }}
                    box-shadow: 0 0 6px alpha({GOLD}, .5); }}
 .piece-icon.maybe {{ background: alpha(#e0a040, .25); color: #f0c060; border: 1px dashed alpha(#f0c060, .7); }}
 .piece-icon.missing {{ background: alpha(black, .35); color: alpha({GOLD}, .45); border: 1px solid alpha({GOLD}, .35); }}
+.piece-icon.guide {{ background: alpha(var(--z-accent), .15); color: var(--z-accent); border: 1px solid alpha(var(--z-accent), .45); }}
 image.not-owned {{ opacity: .25; filter: grayscale(1); }}
 
 .region-chip {{ border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700;

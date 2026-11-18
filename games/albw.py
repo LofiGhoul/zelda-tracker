@@ -66,14 +66,25 @@ class LinkBetweenWorlds(Game):
         if not _crc_ok(d):
             res.banners.append("This save's checksum doesn't match, so it may be damaged or edited.")
 
-        extra = hearts - 3
-        heart_sec = Section("hearts", "Hearts", None, [
-            Row(f"ht_{k + 4}", f"Heart {k + 4}", "", y(k < extra)) for k in range(17)
-        ], intro=(f"{hearts} of 20 hearts, plus {frags}/4 toward the next. 10 come from bosses and 7 from "
-                  "the 28 Pieces of Heart; this tracker doesn't read which pieces you found yet."))
+        from .guides import albw_data
+        cleared = {"Eastern Palace": d[0xE2], "House of Gales": d[0xE1], "Tower of Hera": d[0xE0]}
+        hc_rows = [Row(f"hc_{i + 1}", f"{boss} Heart Container", f"{place}.",
+                       "inferred" if cleared.get(place) else None)
+                   for i, (place, boss, _st) in enumerate(albw_data.HEART_CONTAINERS)]
+        containers = sum(1 for r in hc_rows if r.ok)
+        found = max(0, min(len(albw_data.HEART_PIECES), (hearts - 3 - containers) * 4 + frags))
+        heart_sec = Section("hearts", "Pieces of Heart", None,
+                            [Row(rid, name, "", None, group=place) for rid, name, place in albw_data.HEART_PIECES],
+                            counted=found,
+                            intro=(f"Your hearts show about {found} pieces. The game has 28; {len(albw_data.HEART_PIECES)} are listed here (Lorule dungeon containers can make "
+                                   "this read high). The save only keeps your heart total, so every piece is listed "
+                                   "as a guide; tap one for the steps."))
+        hc_sec = Section("bosses", "Heart Containers", "emblem-favorite-symbolic", hc_rows,
+                         intro="The Hyrule dungeons are marked from your pendants; the save doesn't show Lorule bosses.")
 
         res.sections = [
             heart_sec,
+            hc_sec,
             Section("pendants", "Pendants", "starred-symbolic", [
                 Row("pe_courage", "Pendant of Courage", "Eastern Palace.", y(d[0xE2])),
                 Row("pe_power", "Pendant of Power", "House of Gales.", y(d[0xE1])),

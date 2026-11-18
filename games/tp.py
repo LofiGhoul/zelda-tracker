@@ -56,8 +56,10 @@ GEAR = [
     (0x49, "Light-filled Master Sword", "After the Palace of Twilight."),
     (0x2A, "Wooden Shield", ""), (0x2C, "Hylian Shield", ""),
     (0x31, "Zora Armor", "From Rutela."), (0x30, "Magic Armor", "Castle Town shop."),
-    (0x35, "Big Wallet", "Agitha's reward."), (0x36, "Giant Wallet", "Agitha's reward."),
-    (0x55, "Big Quiver", ""), (0x56, "Giant Quiver", ""),
+    (0x35, "Big Wallet", "A reward from Agitha for Golden Bugs."),
+    (0x36, "Giant Wallet", "A reward from Agitha for Golden Bugs."),
+    (0x55, "Big Quiver", "First prize at the STAR game in Castle Town."),
+    (0x56, "Giant Quiver", "Second prize at the STAR game in Castle Town."),
 ]
 BOTTLE_IDS = set(range(0x60, 0x80)) | {0x9C, 0x9D, 0x9E, 0x9F}
 
@@ -117,11 +119,23 @@ class TwilightPrincess(Game):
         hearts, pieces = life // 5, life % 5
         res = Result(self, slot, name, hearts, pieces, pieces_per_heart=5)
 
-        extra = hearts - 3
-        heart_sec = Section("hearts", "Hearts", None, [
-            Row(f"ht_{k + 4}", f"Heart {k + 4}", "", y(k < extra)) for k in range(17)
-        ], intro=(f"{hearts} of 20 hearts, plus {pieces}/5 toward the next. 8 come from bosses and 9 from "
-                  "the 45 Pieces of Heart; this tracker doesn't read which pieces you found yet."))
+        from .guides import tp_data
+        bosses = [  # (dungeon, boss, test for "finished")
+            ("Forest Temple", "Diababa", q[CRYSTAL] & 1), ("Goron Mines", "Fyrus", q[CRYSTAL] & 2),
+            ("Lakebed Temple", "Morpheel", q[CRYSTAL] & 4), ("Arbiter's Grounds", "Stallord", q[MIRROR] & 1),
+            ("Snowpeak Ruins", "Blizzeta", q[MIRROR] & 2), ("Temple of Time", "Armogohma", q[MIRROR] & 4),
+            ("City in the Sky", "Argorok", q[MIRROR] & 8), ("Palace of Twilight", "Zant", got(0x49)),
+        ]
+        hc_rows = [Row(f"hc_{i + 1}", f"{boss} Heart Container", f"{dungeon}.",
+                       "inferred" if done else None) for i, (dungeon, boss, done) in enumerate(bosses)]
+        containers = sum(1 for r in hc_rows if r.ok)
+        found_pieces = max(0, min(45, (hearts - 3 - containers) * 5 + pieces))
+        hp_rows = [Row(rid, name, "", None, group=area) for rid, name, area in tp_data.HEART_PIECES]
+        heart_sec = Section("hearts", "Pieces of Heart", None, hp_rows, counted=found_pieces,
+                            intro=(f"Your hearts show about {found_pieces} of 45 pieces. The save only keeps your "
+                                   "heart total, so every piece is listed as a guide; tap one for the steps."))
+        hc_sec = Section("bosses", "Heart Containers", "emblem-favorite-symbolic", hc_rows,
+                         intro="Marked from the dungeon rewards you have (you get the container from the boss).")
 
         poes = q[POE_SOULS]
         letters = popcount(struct.unpack_from(">Q", q, LETTERS)[0])
@@ -129,11 +143,14 @@ class TwilightPrincess(Game):
         bug_rows = []
         for i, bug in enumerate(BUGS):
             for sex, off in (("Male", 0), ("Female", 1)):
-                bug_rows.append(Row(f"bg_{i * 2 + off}", f"{sex} {bug}", "Give it to Agitha in Castle Town.",
+                spot = tp_data.BUG_SPOTS.get(f"{sex}_{bug.replace(' ', '_')}")
+                hint = f"{spot[0]} ({spot[1]})." if spot else "Give it to Agitha in Castle Town."
+                bug_rows.append(Row(f"bg_{i * 2 + off}", f"{sex} {bug}", hint,
                                     y(got(0xC0 + i * 2 + off)), group=bug))
 
         res.sections = [
             heart_sec,
+            hc_sec,
             Section("quest", "Fused Shadows & Mirror Shards", "starred-symbolic", [
                 Row("fs_1", "Fused Shadow 1", "Forest Temple.", y(q[CRYSTAL] & 1)),
                 Row("fs_2", "Fused Shadow 2", "Goron Mines.", y(q[CRYSTAL] & 2)),

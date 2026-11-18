@@ -46,9 +46,13 @@ Needs only Python 3 with PyGObject, GTK 4 and libadwaita ≥ 1.7. It reads saves
 
 Every section has instructions:
 
-- Checks with a fixed location (heart pieces, dungeon items, songs, seashells, Golden Bugs and so on)
-  expand into numbered steps. Item requirements come from the randomizers' logic where they exist
-  (LADXR, oracles-randomizer-ng, Archipelago).
+- Every item, heart piece, song, mask, upgrade and bottle with a fixed location expands into
+  numbered steps, in every game.
+- Where a game's save only stores your heart total (Minish Cap, A Link Between Worlds, Twilight
+  Princess), every Piece of Heart is still listed with its own steps as a guide list, and the
+  count at the top tells you how many you have. Item requirements come from the randomizers' logic where they exist
+  (LADXR, oracles-randomizer-ng, Archipelago, the OoT3D/MM3D/TP/ALBW/Minish Cap randomizers),
+  so the locations match the real game.
 - Things the save only counts (Poe Souls, figurines, Kinstone fusions, rings, photos, total hearts)
   get a "How to get these" card at the top of their page.
 - The guides live in `games/guides/<game>.py`. They were written from community sources and memory,
