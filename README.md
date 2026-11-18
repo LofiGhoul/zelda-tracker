@@ -79,8 +79,14 @@ Some things the games simply don't store per location:
 
 - **Oracles:** only some Pieces of Heart have a flag we can name (chests, Maple, the gasha
   tree, the shops). The rest are counted from your heart total and marked **Inferred**.
-- **Minish Cap, A Link Between Worlds, Twilight Princess:** hearts are shown as a total
-  (this tracker doesn't read per-location heart flags for them). Poe Souls (TP) are counted.
+- **Twilight Princess:** every Piece of Heart is read from the save, using the stage flags from
+  the Twilight Princess Archipelago world. Heart Containers are worked out from your dungeon
+  rewards. Poe Souls are counted.
+- **Minish Cap:** every Piece of Heart and Heart Container is read from the save, using the flag
+  names documented in zeldaret/tmc (US and EU/JP numbering). Only Simon's simulation chest has no
+  documented flag and is counted from your hearts.
+- **A Link Between Worlds:** the save keeps only your heart total, so each Piece of Heart is a guide
+  you can tick off yourself; a 20-heart save shows everything as found.
 - **A Link to the Past:** 19 of the 24 Pieces of Heart are read by location; the other 5 are
   counted from your hearts and marked **Inferred**.
   Kinstone fusions and the photo album (LADX) are counted rather than named.

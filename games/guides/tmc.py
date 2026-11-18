@@ -2,6 +2,45 @@
 (games/guides/tmc_data.py, generated)."""
 
 from .tmc_data import HEART_CONTAINERS, HEART_PIECE_STEPS, ITEM_LOCATIONS
+from ..tmc_flags_data import FLAGS
+
+DUNGEONS = ("Deepwood Shrine", "Cave of Flames", "Fortress of Winds", "Temple of Droplets", "Palace of Winds")
+
+
+def _flag_piece_steps(desc: str, area: str) -> tuple[str, ...]:
+    """Steps for a heart piece from the decomp's description of where it is."""
+    out = [f"Go into the {area}." if area in DUNGEONS else f"Go to {area}.", f"It's at: {desc}."]
+    d = desc.lower()
+    if "beanstalk" in d:
+        out.append("Fuse Kinstones to grow the beanstalk, climb it into the clouds and find the piece up top.")
+    elif "minish" in d:
+        out.append("Shrink to Minish size on a portal stump (with Ezlo) to get in.")
+    elif "digging" in d or "mole" in d:
+        out.append("Dig through the soft walls with the Mole Mitts.")
+    elif "dojo" in d or "blade" in d:
+        out.append("It's in the Blade Brother's dojo room; you may need to pass his test first.")
+    elif "tree" in d:
+        out.append("Look in or on the tree; many tree spots open after a Kinstone fusion.")
+    elif "grave" in d:
+        out.append("Open the grave in the Royal Valley (you'll need the Lamp and to solve the grave puzzle).")
+    elif "power bracelets" in d:
+        out.append("You need the Power Bracelets to move the blocks.")
+    elif "bell" in d:
+        out.append("It sits on top of the bell in the middle of Hyrule Town; use Roc's Cape to reach it.")
+    elif "cucco" in d:
+        out.append("Play Anju's cucco game in Hyrule Town until you clear level 10.")
+    elif "cave" in d:
+        out.append("Find the cave entrance; some are blown open with Bombs or opened by a Kinstone fusion.")
+    return tuple(out)
+
+
+FLAG_STEPS = {}
+for _region in FLAGS.values():
+    for _name, _bit, _desc, _area in _region["hp"]:
+        FLAG_STEPS[f"hp_{_name.lower()}"] = _flag_piece_steps(_desc, _area)
+    for _name, _bit, _desc in _region["hc"]:
+        FLAG_STEPS[f"hc_{_name.lower()}"] = (f"It's at: {_desc}.", "Beat the boss (or finish the Librari fusion) and pick it up.")
+FLAG_STEPS["hp_simon"] = ("Go to Hyrule Town.", "Visit Simon's house and play his simulation game; win to open the chest with the piece.")
 
 
 def _loc(key: str, n: int = 0) -> tuple[str, ...]:
@@ -22,7 +61,7 @@ ITEM_KEYS = {
     "bf_70": "ArrowButterfly", "bf_71": "DigButterfly", "bf_72": "SwimButterfly",
 }
 GENERATED = {
-    **HEART_PIECE_STEPS,
+    **FLAG_STEPS,
     **{rid: _loc(key) for rid, key in ITEM_KEYS.items() if _loc(key)},
     **{f"up_wallet{n + 1}": _loc("Wallet", n) for n in range(3)},
     **{f"up_bombs{i + 1}": st for i, st in enumerate(

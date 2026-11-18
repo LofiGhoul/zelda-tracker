@@ -130,22 +130,27 @@ class MinishCap(Game):
         hearts, pieces = max_hp // 8, s[STATS + 1] & 3
         res = Result(self, slot, name, hearts, pieces)
 
-        from .guides import tmc_data
-        boss_done = [inv(0x40), inv(0x41), inv(0x17), inv(0x42), inv(0x43)]  # elements / ocarina after the boss
-        hc_rows = []
-        for i, (area, _name, _st) in enumerate(tmc_data.HEART_CONTAINERS):
-            done = boss_done[i - 1] if 0 < i <= len(boss_done) else False
-            label = "Librari's Heart Container" if i == 0 else f"{area} Heart Container"
-            hc_rows.append(Row(f"hc_{i + 1}", label, f"{area}.", "inferred" if done else None))
+        from .tmc_flags_data import FLAGS
+        region = "EU" if b"ZELDA 3" in d[:32] or b"ZELDA 3" in d[0x1000:0x1020] else "USA"
+        table = FLAGS[region]
+        flag_bits = s[0x25C:0x25C + 0x200]
+
+        def flag(n: int) -> bool:
+            return bool(flag_bits[n >> 3] >> (n & 7) & 1)
+
+        hc_rows = [Row(f"hc_{name.lower()}", f"Heart Container: {desc}", "", y(flag(bit)))
+                   for name, bit, desc in table["hc"]]
+        hp_rows = [Row(f"hp_{name.lower()}", desc, "", y(flag(bit)), group=area)
+                   for name, bit, desc, area in table["hp"]]
+        named = sum(1 for r in hp_rows if r.ok)
         containers = sum(1 for r in hc_rows if r.ok)
-        found = max(0, min(44, (hearts - 3 - containers) * 4 + pieces))
-        heart_sec = Section("hearts", "Pieces of Heart", None,
-                            [Row(rid, desc, "", None, group=area) for rid, desc, area in tmc_data.HEART_PIECES],
-                            counted=found,
-                            intro=(f"Your hearts show about {found} of 44 pieces. The save only keeps your heart "
-                                   "total, so every piece is listed as a guide; tap one for the steps."))
-        hc_sec = Section("bosses", "Heart Containers", "emblem-favorite-symbolic", hc_rows,
-                         intro="Boss containers are marked from the Elements (and Ocarina) you have.")
+        from_hearts = (hearts - 3 - containers) * 4 + pieces
+        hp_rows.append(Row("hp_simon", "Simon's simulation chest", "The one piece without a documented flag; "
+                           "counted from your hearts.", "inferred" if from_hearts > named else None,
+                           group="Hyrule Town"))
+        heart_sec = Section("hearts", "Pieces of Heart", None, hp_rows,
+                            intro=f"{min(44, max(named, from_hearts))} of 44 pieces. Tap a piece for the steps.")
+        hc_sec = Section("bosses", "Heart Containers", "emblem-favorite-symbolic", hc_rows)
 
         figs = [(n, bool(s[FIGURINES + (n >> 3)] >> (n & 7) & 1)) for n in range(1, 137)]
         fig_count = sum(ok for _n, ok in figs)

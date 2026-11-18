@@ -128,12 +128,15 @@ class TwilightPrincess(Game):
         ]
         hc_rows = [Row(f"hc_{i + 1}", f"{boss} Heart Container", f"{dungeon}.",
                        "inferred" if done else None) for i, (dungeon, boss, done) in enumerate(bosses)]
-        containers = sum(1 for r in hc_rows if r.ok)
-        found_pieces = max(0, min(45, (hearts - 3 - containers) * 5 + pieces))
-        hp_rows = [Row(rid, name, "", None, group=area) for rid, name, area in tp_data.HEART_PIECES]
-        heart_sec = Section("hearts", "Pieces of Heart", None, hp_rows, counted=found_pieces,
-                            intro=(f"Your hearts show about {found_pieces} of 45 pieces. The save only keeps your "
-                                   "heart total, so every piece is listed as a guide; tap one for the steps."))
+        from .guides.tp_flags import HEART_PIECE_FLAGS
+        hp_rows = []
+        for rid, name, area in tp_data.HEART_PIECES:
+            off, bit = HEART_PIECE_FLAGS[rid]
+            short = name[len(area):].strip() if name.lower().startswith(area.lower()) else name
+            hp_rows.append(Row(rid, short or name, "", y(q[off] & bit), group=area))
+        found = sum(1 for r in hp_rows if r.ok)
+        heart_sec = Section("hearts", "Pieces of Heart", None, hp_rows,
+                            intro=f"{found} of 45 pieces. Tap a piece for the steps and the items it needs.")
         hc_sec = Section("bosses", "Heart Containers", "emblem-favorite-symbolic", hc_rows,
                          intro="Marked from the dungeon rewards you have (you get the container from the boss).")
 

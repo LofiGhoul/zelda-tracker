@@ -618,7 +618,7 @@ class TrackerWindow(Adw.ApplicationWindow):
         if sec.banner:
             page.append(self._banner("dialog-question-symbolic", sec.banner))
         intro = sec.intro
-        if sec.counted is not None:
+        if sec.counted is not None and sec.counted < len(sec.rows):
             intro += " Tap a marker to tick off the ones you've found; the app remembers them for this save."
         if intro:
             info = Gtk.Label(label=intro.strip(), xalign=0, wrap=True)
@@ -643,14 +643,19 @@ class TrackerWindow(Adw.ApplicationWindow):
                 continue
             shown_total += len(shown)
             group = Adw.PreferencesGroup(title=GLib.markup_escape_text(title or sec.title))
-            if counted:
+            if counted and sec.counted >= len(sec.rows):
+                group.set_header_suffix(chip(f"{len(members)} / {len(members)}", True))
+            elif counted:
                 mine = sum(1 for m in members if m.id in self._ticks())
                 group.set_header_suffix(chip(f"{mine} / {len(members)} ticked" if mine else f"{len(members)}",
                                              mine == len(members)))
             else:
                 group.set_header_suffix(chip(f"{got} / {len(members)}", got == len(members)))
             for m in shown:
-                group.add(self._row_widget(r.game.id, m, guide_only=counted))
+                all_done = counted and sec.counted >= len(sec.rows)
+                if all_done:
+                    m = Row(m.id, m.name, m.hint, "yes", m.detail, m.group, m.steps)
+                group.add(self._row_widget(r.game.id, m, guide_only=counted and not all_done))
             page.append(group)
         if not shown_total:
             page.append(Adw.StatusPage(icon_name="starred-symbolic", title="All done here!",

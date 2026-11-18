@@ -68,8 +68,9 @@ class LinkBetweenWorlds(Game):
 
         from .guides import albw_data
         cleared = {"Eastern Palace": d[0xE2], "House of Gales": d[0xE1], "Tower of Hera": d[0xE0]}
+        maxed = hearts >= 20  # 20 hearts is only possible with every container and piece
         hc_rows = [Row(f"hc_{i + 1}", f"{boss} Heart Container", f"{place}.",
-                       "inferred" if cleared.get(place) else None)
+                       "yes" if maxed else ("inferred" if cleared.get(place) else None))
                    for i, (place, boss, _st) in enumerate(albw_data.HEART_CONTAINERS)]
         containers = sum(1 for r in hc_rows if r.ok)
         found = max(0, min(len(albw_data.HEART_PIECES), (hearts - 3 - containers) * 4 + frags))
