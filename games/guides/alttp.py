@@ -1,0 +1,190 @@
+"""Step-by-step guide for A Link to the Past (SNES)."""
+
+MIRROR_HINT = "Stand on the matching spot in the Dark World and use the Magic Mirror to warp back."
+
+STEPS = {
+    # ---- Pieces of Heart ------------------------------------------------------
+    "hp_sunken": (
+        "Go to the Dam (Floodgate) in the south of the Light World, near the Swamp.",
+        "Pull the lever inside the dam building to drain the water.",
+        "Step outside: the piece is where the water used to be.",
+    ),
+    "hp_zora": (
+        "Buy the Zora's Flippers from King Zora (500 Rupees) at Zora's Waterfall.",
+        "Swim back down the river from King Zora's area.",
+        "The piece sits on a ledge in the water that you can only reach by swimming.",
+    ),
+    "hp_lake_island": (
+        "Get the Flippers, Moon Pearl and Magic Mirror.",
+        "In the Dark World, swim to the island in the lake (where the Ice Palace is).",
+        "Stand on the island's matching spot and use the Mirror to land on the Light World island.",
+    ),
+    "hp_maze_race": (
+        "Go to the Maze Race south-west of Kakariko Village.",
+        "Run through the maze to the end; the piece is on the far side.",
+        "If you can't make it in time, you can also reach it with the Magic Mirror from the Dark World.",
+    ),
+    "hp_desert_ledge": (
+        "Open the Desert Palace with the Book of Mudora.",
+        "Leave through the palace's west exit onto the ledge.",
+        "The piece is on that ledge above the desert.",
+    ),
+    "hp_spectacle": (
+        "Get the Magic Mirror from the Old Man on Death Mountain.",
+        "Go to the Dark World version of Death Mountain and stand next to where Spectacle Rock is.",
+        MIRROR_HINT,
+        "Climb Spectacle Rock to grab the piece.",
+    ),
+    "hp_floating": (
+        "Get the Titan's Mitt, Moon Pearl and Magic Mirror.",
+        "Go to the Dark World east Death Mountain and stand under the floating island.",
+        MIRROR_HINT,
+        "Bomb and climb your way up onto the floating island.",
+    ),
+    "hp_kak_well": (
+        "Jump into the well in Kakariko Village.",
+        "Bomb the cracked wall inside to reach the top part of the cave.",
+        "The piece is in that upper area.",
+    ),
+    "hp_lumberjack": (
+        "Beat Agahnim in Hyrule Castle first.",
+        "Go to the lumberjacks' house north of Kakariko.",
+        "Dash into the tree between them with the Pegasus Boots and drop into the hole.",
+        "The piece is in the cave below.",
+    ),
+    "hp_cave45": (
+        "Get the Magic Mirror.",
+        "In the Dark World south of the Village of Outcasts, find the spot matching Cave 45's ledge.",
+        MIRROR_HINT,
+        "Enter the cave for the piece.",
+    ),
+    "hp_graveyard": (
+        "Get the Magic Mirror and bombs.",
+        "In the Dark World, go to the ledge at the back of the graveyard area.",
+        MIRROR_HINT,
+        "Bomb the wall on the Light World ledge and enter the cave.",
+    ),
+    "hp_checkerboard": (
+        "Get the Flute, Titan's Mitt and Magic Mirror.",
+        "In the Dark World desert (Misery Mire), stand on the ledge west of the desert.",
+        MIRROR_HINT,
+        "Lift the rock on the Light World ledge and drop into the checkerboard cave.",
+    ),
+    "hp_spectacle_cave": (
+        "Get to Light World Death Mountain.",
+        "Enter the cave next to Spectacle Rock.",
+        "The piece is inside.",
+    ),
+    "hp_mimic": (
+        "Get the Magic Mirror and the Hammer.",
+        "From inside Turtle Rock's area in the Dark World, mirror back to the Light World east Death Mountain ledge.",
+        "Enter the Mimic Cave and beat the Mimics; the piece is at the end.",
+    ),
+    "hp_pyramid": (
+        "Go to the Pyramid of Power in the middle of the Dark World.",
+        "Walk around its ledges; the piece sits on one of them.",
+    ),
+    "hp_bumper": (
+        "Get the Magic Cape and the Power Glove.",
+        "In the Dark World, enter Bumper Cave north-west of the Village of Outcasts.",
+        "Use the Cape to pass the gaps and leave through the top exit.",
+        "The piece is on the ledge outside.",
+    ),
+    "hp_digging": (
+        "Go to the digging game in the south-west of the Dark World.",
+        "Pay 80 Rupees and dig with the shovel you're given.",
+        "Keep digging until the piece turns up (it's random).",
+    ),
+    "hp_chest_game": (
+        "Go to the treasure chest game in the Village of Outcasts.",
+        "Pay 30 Rupees to open two chests per round.",
+        "Keep playing until one of them holds the piece.",
+    ),
+    "hp_peg_cave": (
+        "Get the Titan's Mitt and the Magic Hammer.",
+        "In the Village of Outcasts, hammer down the pegs in the south-east corner.",
+        "Enter the cave behind them for the piece.",
+    ),
+    # ---- Heart Containers ------------------------------------------------------
+    "hc_12": ("Escape Hyrule Castle through the sewers to the Sanctuary.", "Open the chest in the Sanctuary for the Heart Container."),
+    **{f"hc_{room:x}": (f"Beat the boss of {name}.", "Pick up the Heart Container it leaves.")
+       for room, name in ((0xC8, "Eastern Palace"), (0x33, "Desert Palace"), (0x07, "Tower of Hera"),
+                          (0x5A, "Palace of Darkness"), (0x06, "Swamp Palace"), (0x29, "Skull Woods"),
+                          (0xAC, "Thieves' Town"), (0xDE, "Ice Palace"), (0x90, "Misery Mire"),
+                          (0xA4, "Turtle Rock"))},
+    # ---- Pendants and crystals ------------------------------------------------------
+    "pe_courage": ("Go to the Eastern Palace, east of Hyrule Castle.", "Beat the Armos Knights."),
+    "pe_power": ("Get the Book of Mudora (Kakariko library, dash into the shelf).",
+                 "Read the stone at the Desert Palace entrance.", "Beat the Lanmolas."),
+    "pe_wisdom": ("Get the Magic Mirror from the Old Man on Death Mountain.",
+                  "Use it to reach the Tower of Hera.", "Beat Moldorm."),
+    "cr_1": ("Get the Moon Pearl.", "Give Kiki the monkey 110 Rupees to open the Palace of Darkness (east Dark World).", "Beat Helmasaur King."),
+    "cr_2": ("Get the Flippers.", "Pull the dam lever in the Light World, then mirror into the Swamp Palace.", "Beat Arrghus."),
+    "cr_3": ("Get the Fire Rod inside Skull Woods.", "Burn the Skull Woods skull's entrance and beat Mothula."),
+    "cr_4": ("Open Thieves' Town in the Village of Outcasts (pull the statue's tail).", "Free the 'maiden' and beat Blind."),
+    "cr_5": ("Get the Flippers and Titan's Mitt.", "Swim to the Ice Palace in the Dark World lake; melt the entrance with the Fire Rod or Bombos.", "Beat Kholdstare."),
+    "cr_6": ("Get the Flute and the Ether Medallion.", "Use Ether at Misery Mire's entrance.", "Beat Vitreous."),
+    "cr_7": ("Get the Quake Medallion and the Cane of Somaria.", "Use Quake on the Turtle Rock entrance (east Dark World Death Mountain).", "Beat Trinexx."),
+    # ---- Items ---------------------------------------------------------------------
+    "it_bow": ("It's the main item of the Eastern Palace.",),
+    "it_boomerang": ("In a chest in Hyrule Castle at the start.",),
+    "it_hookshot": ("It's the main item of the Swamp Palace.",),
+    "it_bombs": ("Buy them at a shop, or pick them up from enemies.",),
+    "it_mushroom": ("Find the Mushroom in the Lost Woods.", "Bring it to the potion shop's witch, then come back later for Magic Powder."),
+    "it_fire_rod": ("It's the main item of Skull Woods.",),
+    "it_ice_rod": ("Bomb the cracked wall of the cave east of Lake Hylia.", "The Ice Rod is inside."),
+    "it_bombos": ("Get the Book of Mudora, Master Sword and Magic Mirror.",
+                  "Mirror onto the ledge with the stone tablet in the desert.",
+                  "Read the tablet with the Book, then swing the sword at it."),
+    "it_ether": ("Get the Book of Mudora, Master Sword and Magic Mirror.",
+                 "Reach the tablet at the top of west Death Mountain.",
+                 "Read the tablet with the Book, then swing the sword at it."),
+    "it_quake": ("Get the Power Glove and Moon Pearl.", "In the Dark World, throw a rock into the pond north-east of the Pyramid.", "The catfish gives you Quake."),
+    "it_lamp": ("Open the chest in Link's house at the very start.",),
+    "it_hammer": ("It's the main item of the Palace of Darkness.",),
+    "it_shovel": ("Go to the Haunted Grove in the Dark World (south of Kakariko's twin).", "Talk to the flute boy; he gives you the Shovel."),
+    "it_flute": ("With the Shovel, dig in the Light World Haunted Grove.", "Activate the Flute at Kakariko's weathervane to call the bird."),
+    "it_net": ("Bring a bottle to the sick boy in Kakariko Village.", "He gives you the Bug-Catching Net."),
+    "it_book": ("Get the Pegasus Boots.", "Dash into the bookshelf in the Kakariko library."),
+    "it_somaria": ("It's the main item of Misery Mire.",),
+    "it_byrna": ("In the Dark World on Death Mountain, enter the Spike Cave (Hammer and Power Glove).", "The Cane of Byrna is at the end."),
+    "it_cape": ("Get the Titan's Mitt.", "Push the gravestone in the Light World graveyard to enter the King's Tomb.", "The Magic Cape is inside."),
+    "it_mirror": ("Climb Death Mountain and rescue the Old Man in the dark cave.", "Bring him home; he gives you the Magic Mirror."),
+    "it_boots": ("Get the Pendant of Courage.", "Talk to Sahasrahla in his hut near the Eastern Palace."),
+    "it_flippers": ("Save up 500 Rupees.", "Go up Zora's Waterfall and pay King Zora."),
+    "it_pearl": ("It's the main item of the Tower of Hera.",),
+    "it_glove": ("It's the main item of the Desert Palace.",),
+    # ---- Upgrades ----------------------------------------------------------------
+    "up_master": ("Collect all three Pendants.", "Pull the Master Sword from its pedestal in the Lost Woods."),
+    "up_tempered": ("In the Dark World, find the frog in the blacksmiths' ruins and lift him with the Titan's Mitt.",
+                    "Walk him back to the Light World smithy (mirror out).",
+                    "Pay the smiths to temper your sword."),
+    "up_golden": ("Get crystals 5 and 6, then buy the Super Bomb at the bomb shop.",
+                  "Set it off at the Pyramid's cracked wall.",
+                  "Throw the Tempered Sword into the fairy's pond inside."),
+    "up_red_boomerang": ("Go to the Waterfall of Wishing (Flippers).", "Throw the Boomerang into the fairy's pond."),
+    "up_silver": ("Blow open the Pyramid's cracked wall with the Super Bomb.", "Throw the Bow into the fairy's pond."),
+    "up_titans": ("It's the main item of Thieves' Town.",),
+    "up_fire_shield": ("Go to the Waterfall of Wishing (Flippers).", "Throw your shield into the fairy's pond."),
+    "up_mirror_shield": ("It's in Turtle Rock.",),
+    "up_blue_mail": ("It's the main item of the Ice Palace.",),
+    "up_red_mail": ("It's in Ganon's Tower.",),
+    "up_half_magic": ("Hammer the pegs by the smithy east of Kakariko and drop into the Magic Bat's hole.",
+                      "Sprinkle Magic Powder on the bat's pot."),
+    "up_bombs": ("Go to the Pond of Happiness on an island in Lake Hylia (Flippers).", "Throw Rupees in until the fairy offers more bomb capacity."),
+    "up_arrows": ("Go to the Pond of Happiness on an island in Lake Hylia (Flippers).", "Throw Rupees in until the fairy offers more arrow capacity."),
+}
+
+SECTIONS = {
+    "hearts": (
+        "The pieces with names are read straight from your save.",
+        "The 'Other Piece of Heart' rows are the pieces this tracker can't place yet; they're counted "
+        "from your heart total. Look for leftover pieces in caves you haven't fully explored.",
+    ),
+    "bottles": (
+        "Bottle 1: buy it from the bottle merchant in Kakariko Village (100 Rupees).",
+        "Bottle 2: in the Kakariko inn, go round the back door to the room behind the bar.",
+        "Bottle 3: the hobo under the bridge east of Link's house (Flippers).",
+        "Bottle 4: carry the purple chest from the Dark World to the man in the Light World who can open it.",
+    ),
+}

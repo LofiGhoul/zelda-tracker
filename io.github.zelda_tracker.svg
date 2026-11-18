@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6df98"/>
+      <stop offset="0.55" stop-color="#d9b45e"/>
+      <stop offset="1" stop-color="#a87f2e"/>
+    </linearGradient>
+    <radialGradient id="bg" cx="0.5" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#1f3a2a"/>
+      <stop offset="1" stop-color="#0b140f"/>
+    </radialGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="26" fill="url(#bg)"/>
+  <rect x="6.75" y="6.75" width="114.5" height="114.5" rx="25.25" fill="none" stroke="#d9b45e" stroke-opacity=".55" stroke-width="1.5"/>
+  <!-- four triangles, same layout as the reference symbol, scaled into the tile -->
+  <g transform="translate(14 18) scale(0.0833)" fill="url(#gold)" stroke="#5a4214" stroke-width="14" stroke-linejoin="round">
+    <path d="M600 95 L877 550 L322 550 Z"/>
+    <path d="M296 595 L571 1055 L48 1055 Z"/>
+    <path d="M354 598 L846 598 L599 1009 Z"/>
+    <path d="M903 595 L1152 1055 L628 1055 Z"/>
+  </g>
+</svg>
