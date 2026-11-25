@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from core import Game, Result, Row, SaveError, Section, SlotRef
@@ -66,15 +67,30 @@ class MajorasMask3D(Game):
         return res
 
 
+def _oot_is_mq(data: bytes):
+    base = _oot.find_base(data)
+    return None if base < 0 else bool(data[base + _oot.OFF_MQ])
+
+
 class OcarinaOfTime3D(Game):
     id, title, short, platform = "oot3d", "Ocarina of Time 3D", "OoT3D", "3DS"
-    file_help = "a save slot file from Checkpoint/JKSM or a 3DS emulator"
+    file_help = "a save slot file (save00.bin, save01.bin, ...) from Checkpoint/JKSM or a 3DS emulator"
+    master_quest = False
 
     def detect(self, path, data):
-        return _oot.find_base(data) >= 0
+        return _oot_is_mq(data) is self.master_quest
 
     def slots(self, path):
-        return [SlotRef(p) for p in _oot.find_slot_siblings(path)]
+        return [SlotRef(p) for p in _oot.find_slot_siblings(path)
+                if _oot_is_mq(p.read_bytes()) is self.master_quest] or [SlotRef(path)]
+
+    def slot_label(self, slot, i):
+        m = re.search(r"(\d+)\.bin$", slot.path.name)
+        if not m:
+            return str(i + 1)
+        n = int(m.group(1))
+        # OoT3D keeps the normal quest in save00-02 and Master Quest in save03-05
+        return str(n - 3 + 1 if self.master_quest and n >= 3 else n + 1)
 
     def read(self, slot):
         try:
@@ -99,11 +115,16 @@ class OcarinaOfTime3D(Game):
                            "Most of them only come out at night.")
                 for row in s.rows:
                     row.detail = ""
-        if r.master_quest:
+        if r.master_quest and not self.master_quest:
             res.tags.append("Master Quest")
         res.footnote = ("Not tracked: the trading sequences, masks, Big Poe captures, cows and "
                         "small keys. Their rewards that matter for 100% are covered above.")
         return res
+
+
+class OcarinaOfTime3DMQ(OcarinaOfTime3D):
+    id, title, short = "oot3dmq", "Ocarina of Time 3D: Master Quest", "OoT3D MQ"
+    master_quest = True
 
 
 # Detection order matters only where formats could overlap; these don't.
@@ -113,6 +134,7 @@ GAMES: list[Game] = [
     OracleOfAges(),
     MinishCap(),
     OcarinaOfTime3D(),
+    OcarinaOfTime3DMQ(),
     MajorasMask3D(),
     LinkBetweenWorlds(),
     TwilightPrincess(),

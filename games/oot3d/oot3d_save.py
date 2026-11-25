@@ -28,7 +28,7 @@ except ImportError:
 
 MAGIC = b"ZELDAZ"
 MAGIC_OFF = 0x30          # SaveContext.newf
-MIN_SIZE = 0x14E0         # through the checksum
+MIN_SIZE = 0x14DC         # a real slot file is 0x14DC bytes (through the checksum)
 
 OFF_NAME = 0x1C           # s16[8], UTF-16LE
 OFF_NAME_LEN = 0x2C
@@ -172,6 +172,9 @@ assert len(PIECES) == TOTAL_PIECES, len(PIECES)
 assert set(STEPS) == {p.id for p in PIECES}, set(STEPS) ^ {p.id for p in PIECES}
 
 
+UNSURE_FLAGS = ("gy_dampe_dig", "hf_scrub_grotto")
+
+
 class SaveError(ValueError):
     pass
 
@@ -248,12 +251,21 @@ def read_slot(path: str | Path) -> SlotResult:
     mq = bool(view.u8(OFF_MQ))
 
     bosses = [boss for scene, boss in BOSS_ROOMS.items() if view.flag(("coll", scene, 0x1F))]
-    expected = max(0, (hearts - 3 - len(bosses)) * 4 + in_progress)
+    expected = min(TOTAL_PIECES, max(0, (hearts - 3 - len(bosses)) * 4 + in_progress))
 
     result = SlotResult(path, name or "(no name)", mq, hearts, in_progress, bosses, expected)
     for p in PIECES:
         if any(view.flag(f) for f in p.flags):
             result.collected[p.id] = "yes"
+    # These two use flags the randomizer defines but the real game may store elsewhere (they
+    # read as missing even on full-heart saves), so credit them from the heart total instead.
+    spare = expected - len(result.collected)
+    for pid in UNSURE_FLAGS:
+        if spare <= 0:
+            break
+        if pid not in result.collected:
+            result.collected[pid] = "inferred"
+            spare -= 1
 
     for cat in build_categories(mq):
         rows = [(c, bool(c.test(view)), c.detail(view) if c.detail else "") for c in cat.checks]

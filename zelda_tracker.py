@@ -137,6 +137,9 @@ ICON_PREFIXES = ("m_", "i_", "s_", "e_", "u_", "q_", "r_", "it_", "el_", "sc_", 
                  "pe_", "cr_", "es_", "se_", "tu_", "rv_", "ni_", "in_", "so_", "up_", "bg_")
 
 
+ICON_ALIASES = {"oot3dmq": "oot3d"}  # Master Quest uses the same item pictures
+
+
 def find_game_icon(game_id: str, row_id: str) -> Path | None:
     """icons/<game>/<id without prefix>.png, e.g. icons/oot3d/hookshot.png for i_hookshot."""
     if not row_id.startswith(ICON_PREFIXES):
@@ -144,9 +147,10 @@ def find_game_icon(game_id: str, row_id: str) -> Path | None:
     key = f"{game_id}/{row_id}"
     if key not in _icon_cache:
         stem = row_id.split("_", 1)[-1]
+        folders = (game_id, ICON_ALIASES[game_id]) if game_id in ICON_ALIASES else (game_id,)
         _icon_cache[key] = next(
-            (d / game_id / f"{stem}{ext}" for d in ICON_DIRS for ext in ICON_EXTS
-             if (d / game_id / f"{stem}{ext}").is_file()), None)
+            (d / g / f"{stem}{ext}" for g in folders for d in ICON_DIRS for ext in ICON_EXTS
+             if (d / g / f"{stem}{ext}").is_file()), None)
     return _icon_cache[key]
 
 

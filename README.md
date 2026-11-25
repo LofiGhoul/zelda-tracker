@@ -9,6 +9,7 @@ category. It works out which game a save belongs to by itself.
 | Game | Platform | What's tracked |
 |---|---|---|
 | Majora's Mask 3D | 3DS | All 52 Pieces of Heart with step-by-step instructions, masks, songs, items, bottles, upgrades, Great Fairies, Spider Houses, bosses, owl statues |
+| Ocarina of Time 3D: Master Quest | 3DS | Everything listed for Ocarina of Time 3D, with the Master Quest dungeon Gold Skulltulas. Master Quest files (save03-05) open as their own game |
 | Ocarina of Time 3D | 3DS | All 36 Pieces of Heart with step-by-step instructions, all 100 Gold Skulltulas (Master Quest too), Skulltula House rewards, Heart Containers, stones and medallions, songs, items, equipment, upgrades, bottles |
 | Link's Awakening DX | Game Boy Color | All 12 Pieces of Heart, Heart Containers, the 8 instruments, songs, items, upgrades, golden leaves and trading quest, hidden seashells, the photo album. Original Game Boy saves work too |
 | Oracle of Seasons | Game Boy Color | Pieces of Heart, Heart Containers, essences, items, upgrades, the four seasons, all 64 rings |

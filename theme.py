@@ -9,6 +9,7 @@ import math
 PALETTES = {
     "default": ("#14251c", "#0b140f", "#1a2d22", "#7fbf6a"),   # Hyrule forest
     "oot3d":   ("#14251c", "#0b140f", "#1a2d22", "#7fbf6a"),   # Kokiri green
+    "oot3dmq": ("#2a1418", "#14090b", "#331a1f", "#e06a5a"),   # Master Quest crimson
     "mm3d":    ("#1d1530", "#0e0a18", "#251c3a", "#b48ae8"),   # Termina moon
     "ladx":    ("#10262a", "#081416", "#15313a", "#6cc8c0"),   # Koholint sea
     "oos":     ("#2a1a10", "#150d07", "#33210f", "#e3994a"),   # autumn Holodrum
