@@ -30,7 +30,7 @@ Standalone apps for Windows and Android live in `app/` (built with Flet, a Pytho
 They use exactly the same save parsers and guides as the Linux app, with the same Zelda look.
 
 - **Get them:** open the repo's *Releases* page and download
-  - `zelda-tracker-windows.zip`: unzip it anywhere and run `zelda-tracker.exe`
+  - `zelda-tracker-windows.zip`: unzip it anywhere and run `zelda_tracker.exe`
     (Windows may ask you to confirm because the app isn't signed);
   - `zelda-tracker-android.apk`: open it on your phone and allow installing from this source.
 - **Open saves:** tap *Open Save Files…* and pick your files. Select all slot files at once
