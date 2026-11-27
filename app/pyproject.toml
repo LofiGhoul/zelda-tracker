@@ -1,0 +1,17 @@
+[project]
+name = "zelda-tracker"
+version = "1.0.0"
+description = "Open your Zelda save and see how close you are to 100%, with a step-by-step guide for every item and heart piece."
+readme = "../README.md"
+requires-python = ">=3.10"
+authors = [{ name = "LofiGhoul" }]
+dependencies = ["flet==0.28.3"]
+
+[tool.flet]
+org = "io.github.lofighoul"
+product = "Zelda 100% Tracker"
+company = "LofiGhoul"
+copyright = "Fan-made, not affiliated with Nintendo"
+
+[tool.flet.app]
+path = "."

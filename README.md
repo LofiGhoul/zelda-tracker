@@ -24,6 +24,23 @@ Twilight Princess on Wii or HD (only GameCube .gci saves), Phantom Hourglass, Sp
 and Tri Force Heroes. Their save formats aren't documented well enough yet to read them
 reliably.
 
+## Windows and Android apps
+
+Standalone apps for Windows and Android live in `app/` (built with Flet, a Python + Flutter toolkit).
+They use exactly the same save parsers and guides as the Linux app, with the same Zelda look.
+
+- **Get them:** open the repo's *Releases* page and download
+  - `zelda-tracker-windows.zip`: unzip it anywhere and run `zelda-tracker.exe`
+    (Windows may ask you to confirm because the app isn't signed);
+  - `zelda-tracker-android.apk`: open it on your phone and allow installing from this source.
+- **Open saves:** tap *Open Save Files…* and pick your files. Select all slot files at once
+  (e.g. `save00.bin`–`save04.bin`) to get a tab for each. Recent saves stay on the start page.
+- On Windows the app re-reads the save every few seconds, so it updates while you play. On Android,
+  open the file again after playing.
+- **Building them:** GitHub Actions builds both (`.github/workflows/apps.yml`): run the workflow from
+  the Actions tab, or push a tag like `v1.0.0` to publish a release. To try the app on Linux:
+  `pip install "flet[all]==0.28.3"` and run `python3 app/main.py`.
+
 ## Run
 
     python3 zelda_tracker.py [path/to/save]

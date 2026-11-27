@@ -1,0 +1,70 @@
+# Builds the standalone apps: a Windows program (.zip with the .exe) and an Android app (.apk).
+# Run it from the Actions tab ("Run workflow"), or push a tag like v1.0.0 to also publish a release.
+name: Build apps
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows
+            os: windows-latest
+          - target: apk
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Put the shared tracker code next to the app
+        shell: bash
+        run: cp -r core.py theme.py games app/
+
+      - name: Install Flet
+        run: pip install "flet[all]==0.28.3"
+
+      - name: Build (${{ matrix.target }})
+        shell: bash
+        working-directory: app
+        env:
+          PYTHONIOENCODING: utf-8
+          PYTHONUTF8: "1"
+        run: flet build ${{ matrix.target }} --verbose --no-rich-output
+
+      - name: Package the Windows app
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: Compress-Archive -Path app/build/windows/* -DestinationPath zelda-tracker-windows.zip
+
+      - name: Package the Android app
+        if: matrix.target == 'apk'
+        shell: bash
+        run: cp app/build/apk/*.apk zelda-tracker-android.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zelda-tracker-${{ matrix.target }}
+          path: |
+            zelda-tracker-windows.zip
+            zelda-tracker-android.apk
+          if-no-files-found: error
+
+      - name: Attach to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            zelda-tracker-windows.zip
+            zelda-tracker-android.apk

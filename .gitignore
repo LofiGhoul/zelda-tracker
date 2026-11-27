@@ -1,6 +1,11 @@
 __pycache__/
 *.pyc
 *.bin
-icons/
+/icons/
 *.sav
 *.srm
+# copied in at build time / build output of the Windows/Android app
+/app/build/
+/app/core.py
+/app/theme.py
+/app/games/
