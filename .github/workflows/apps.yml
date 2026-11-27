@@ -17,7 +17,7 @@ jobs:
       matrix:
         include:
           - target: windows
-            os: windows-latest
+            os: windows-2022   # has Visual Studio 2022, which Flutter 3.29 knows
           - target: apk
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
